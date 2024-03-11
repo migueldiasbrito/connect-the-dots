@@ -9,16 +9,7 @@ namespace Mdb.Ctd.Dots.Services
 
         public DotsService(IDotsConfig config)
         {
-            _model = new DotGrid
-            {
-                Dots = new Dot[config.Width][]
-            };
-
-            // TODO (MB) can this be improved?
-            for (int i = 0; i < _model.Dots.Length; ++i)
-            {
-                _model.Dots[i] = new Dot[config.Height];
-            }
+            _model = new DotGrid { Dots = new Dot[config.Width, config.Height] };
         }
     }
 }
