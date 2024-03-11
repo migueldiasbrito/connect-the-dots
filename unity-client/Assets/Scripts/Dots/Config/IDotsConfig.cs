@@ -6,5 +6,6 @@ namespace Mdb.Ctd.Dots.Config
     {
         int Width { get; }
         int Height { get; }
+        int MaxNewCellValue { get; }
     }
 }
