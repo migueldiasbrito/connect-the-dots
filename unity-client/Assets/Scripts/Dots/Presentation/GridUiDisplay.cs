@@ -1,5 +1,6 @@
 using Mdb.Ctd.Data;
 using Mdb.Ctd.Dots.Data;
+using System.Collections;
 using UnityEngine;
 
 namespace Mdb.Ctd.Dots.Presentation
@@ -11,16 +12,22 @@ namespace Mdb.Ctd.Dots.Presentation
 
         private IDotGridDataReader _dotGridDataReader;
 
+        private DotUiDisplay[,] _dotUiDisplayGrid;
+
         private void Start()
         {
             _dotGridDataReader = DataReaders.Get<IDotGridDataReader>();
 
-            InitializeGrid();
+            StartCoroutine(InitializeGrid());
         }
 
-        private void InitializeGrid()
+        private IEnumerator InitializeGrid()
         {
+            yield return new WaitForEndOfFrame();
+
             IDot[,] grid = _dotGridDataReader.Grid;
+
+            _dotUiDisplayGrid = new DotUiDisplay[grid.GetLength(0), grid.GetLength(1)];
 
             for (int x = 0; x < grid.GetLength(0); ++x)
             {
@@ -28,7 +35,8 @@ namespace Mdb.Ctd.Dots.Presentation
                 {
                     if (grid[x, y] == null) continue;
 
-                    Instantiate(_dotPrefab, _dotHolders[x + y * grid.GetLength(0)]);
+                    _dotUiDisplayGrid[x,y] = Instantiate(_dotPrefab, _dotHolders[x + y * grid.GetLength(0)]);
+                    _dotUiDisplayGrid[x, y].Setup(grid[x, y]);
                 }
             }
         }

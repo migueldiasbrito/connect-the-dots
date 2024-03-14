@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2179b17937fec6428ac104968ea4f0f, type: 3}
   m_Name: DotsConfig
   m_EditorClassIdentifier: 
-  <GridSize>k__BackingField: {x: 5, y: 5}
+  <Width>k__BackingField: 5
+  <Height>k__BackingField: 5
+  <MaxNewCellValue>k__BackingField: 128
