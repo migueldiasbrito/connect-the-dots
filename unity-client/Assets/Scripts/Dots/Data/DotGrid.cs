@@ -1,6 +1,6 @@
 namespace Mdb.Ctd.Dots.Data
 {
-    public class DotGrid : IDotGrid
+    public class DotGrid : IDotGridDataReader
     {
         public IDot[,] Grid => Dots;
 

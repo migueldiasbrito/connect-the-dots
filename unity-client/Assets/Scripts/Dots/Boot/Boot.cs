@@ -14,7 +14,7 @@ namespace Mdb.Ctd.Dots.Boot
         private void Awake()
         {
             DotGrid dotGrid = new();
-            DataReaders.Bind<IDotGrid>(dotGrid);
+            DataReaders.Bind<IDotGridDataReader>(dotGrid);
 
             DotsService dotsService = new(dotGrid, _dotsConfig);
             ServiceLocator.Bind<IDotsService>(dotsService);

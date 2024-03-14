@@ -1,8 +1,6 @@
-using Mdb.Ctd.Data;
-
 namespace Mdb.Ctd.Dots.Data
 {
-    public interface IDot : IDataReader
+    public interface IDot
     {
         int Value { get; }
         int X { get; }

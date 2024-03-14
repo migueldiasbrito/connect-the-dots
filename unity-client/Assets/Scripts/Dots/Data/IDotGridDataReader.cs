@@ -2,7 +2,7 @@ using Mdb.Ctd.Data;
 
 namespace Mdb.Ctd.Dots.Data
 {
-    public interface IDotGrid : IDataReader
+    public interface IDotGridDataReader : IDataReader
     {
         IDot[,] Grid { get; }
     }

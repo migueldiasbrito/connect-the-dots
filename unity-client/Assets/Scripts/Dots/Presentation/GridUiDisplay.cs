@@ -1,6 +1,5 @@
 using Mdb.Ctd.Data;
 using Mdb.Ctd.Dots.Data;
-using System;
 using UnityEngine;
 
 namespace Mdb.Ctd.Dots.Presentation
@@ -10,18 +9,18 @@ namespace Mdb.Ctd.Dots.Presentation
         [SerializeField] private Transform[] _dotHolders;
         [SerializeField] private DotUiDisplay _dotPrefab;
 
-        private IDotGrid _dotGrid;
+        private IDotGridDataReader _dotGridDataReader;
 
         private void Start()
         {
-            _dotGrid = DataReaders.Get<IDotGrid>();
+            _dotGridDataReader = DataReaders.Get<IDotGridDataReader>();
 
             InitializeGrid();
         }
 
         private void InitializeGrid()
         {
-            IDot[,] grid = _dotGrid.Grid;
+            IDot[,] grid = _dotGridDataReader.Grid;
 
             for (int x = 0; x < grid.GetLength(0); ++x)
             {
