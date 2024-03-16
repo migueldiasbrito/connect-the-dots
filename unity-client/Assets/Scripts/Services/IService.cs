@@ -1,6 +1,4 @@
 namespace Mdb.Ctd.Services
 {
-    public interface IService
-    {
-    }
+    public interface IService {}
 }

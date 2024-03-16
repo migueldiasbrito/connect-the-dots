@@ -1,5 +1,7 @@
 using Mdb.Ctd.Dots.Data;
+using Mdb.Ctd.Swipe;
 using Mdb.Ctd.Utils;
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -17,6 +19,11 @@ namespace Mdb.Ctd.Dots.Presentation
 
             Rect parent = ((RectTransform)transform.parent).rect;
             ((RectTransform)transform).sizeDelta = new Vector2(parent.width, parent.height);
+        }
+
+        internal void SetSelected(bool selected)
+        {
+            _animator.SetBool(AnimatorUtils.Selected, selected);
         }
     }
 }

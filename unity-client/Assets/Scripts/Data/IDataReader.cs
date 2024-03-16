@@ -1,6 +1,4 @@
 namespace Mdb.Ctd.Data
 {
-    public interface IDataReader
-    {
-    }
+    public interface IDataReader {}
 }
