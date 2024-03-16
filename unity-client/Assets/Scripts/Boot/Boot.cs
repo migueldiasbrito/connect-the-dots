@@ -5,7 +5,7 @@ using Mdb.Ctd.Dots.Services;
 using Mdb.Ctd.Services;
 using UnityEngine;
 
-namespace Mdb.Ctd.Dots.Boot
+namespace Mdb.Ctd.Boot
 {
     public class Boot : MonoBehaviour
     {
