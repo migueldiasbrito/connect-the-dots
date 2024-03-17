@@ -17,7 +17,7 @@ namespace Mdb.Ctd.Dots.Presentation
 
         private IDotGridDataReader _dotGridDataReader;
 
-        private DotUiDisplay[,] _dotUiDisplayGrid;
+        private Dictionary<IDot, DotUiDisplay> _dotsDisplays = new();
 
         private List<DotUiDisplay> _currentDotsSwipedOver = new();
 
@@ -93,16 +93,16 @@ namespace Mdb.Ctd.Dots.Presentation
 
             IDot[,] grid = _dotGridDataReader.Grid;
 
-            _dotUiDisplayGrid = new DotUiDisplay[grid.GetLength(0), grid.GetLength(1)];
-
             for (int x = 0; x < grid.GetLength(0); ++x)
             {
                 for (int y = 0; y < grid.GetLength(1); ++y)
                 {
-                    if (grid[x, y] == null) continue;
+                    IDot dot = grid[x, y];
+                    if (dot == null) continue;
 
-                    _dotUiDisplayGrid[x,y] = Instantiate(_dotPrefab, _dotHolders[x + y * grid.GetLength(0)]);
-                    _dotUiDisplayGrid[x, y].Setup(grid[x, y]);
+                    DotUiDisplay dotDisplay = Instantiate(_dotPrefab, _dotHolders[x + y * grid.GetLength(0)]);
+                    dotDisplay.Setup(dot);
+                    _dotsDisplays[dot] = dotDisplay;
                 }
             }
         }
