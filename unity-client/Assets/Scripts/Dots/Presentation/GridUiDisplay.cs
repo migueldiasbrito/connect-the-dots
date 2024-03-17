@@ -3,6 +3,7 @@ using Mdb.Ctd.Dots.Data;
 using Mdb.Ctd.Swipe;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Mdb.Ctd.Dots.Presentation
@@ -12,6 +13,7 @@ namespace Mdb.Ctd.Dots.Presentation
         [SerializeField] private Transform[] _dotHolders;
         [SerializeField] private DotUiDisplay _dotPrefab;
         [SerializeField] private SwipeController _swipeController;
+        [SerializeField] private DotUiDisplay _currentSequenceValueDisplay;
 
         private IDotGridDataReader _dotGridDataReader;
 
@@ -34,6 +36,10 @@ namespace Mdb.Ctd.Dots.Presentation
 
             _currentDotsSwipedOver.Add(dotPressed);
             dotPressed.SetSelected(true);
+
+            _currentSequenceValueDisplay.SetVisible(true);
+            _currentSequenceValueDisplay.SetValue(_dotGridDataReader.GetSequenceValue(
+                _currentDotsSwipedOver.Select(x => (x.Dot.X, x.Dot.Y)).ToArray()));
         }
 
         private void OnSwipeOverDot(ISwipable swipable)
@@ -52,6 +58,10 @@ namespace Mdb.Ctd.Dots.Presentation
                 }
 
                 _currentDotsSwipedOver.RemoveRange(i + 1, _currentDotsSwipedOver.Count - i - 1);
+
+                _currentSequenceValueDisplay.SetValue(_dotGridDataReader.GetSequenceValue(
+                    _currentDotsSwipedOver.Select(x => (x.Dot.X, x.Dot.Y)).ToArray()));
+
                 return;
             }
 
@@ -61,6 +71,9 @@ namespace Mdb.Ctd.Dots.Presentation
 
             _currentDotsSwipedOver.Add(dotSwipedOver);
             dotSwipedOver.SetSelected(true);
+
+            _currentSequenceValueDisplay.SetValue(_dotGridDataReader.GetSequenceValue(
+                _currentDotsSwipedOver.Select(x => (x.Dot.X, x.Dot.Y)).ToArray()));
         }
 
         private void OnEndSwipe()
@@ -70,6 +83,8 @@ namespace Mdb.Ctd.Dots.Presentation
                 _currentDotsSwipedOver[i].SetSelected(false);
             }
             _currentDotsSwipedOver.Clear();
+
+            _currentSequenceValueDisplay.SetVisible(false);
         }
 
         private IEnumerator InitializeGrid()

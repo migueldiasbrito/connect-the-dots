@@ -7,5 +7,7 @@ namespace Mdb.Ctd.Utils
         public static int Value => Animator.StringToHash("Value");
 
         public static int Selected => Animator.StringToHash("Selected");
+
+        public static int Visible => Animator.StringToHash("Visible");
     }
 }

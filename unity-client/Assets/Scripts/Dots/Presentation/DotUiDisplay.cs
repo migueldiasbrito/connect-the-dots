@@ -1,5 +1,6 @@
 using Mdb.Ctd.Dots.Data;
 using Mdb.Ctd.Utils;
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -16,16 +17,27 @@ namespace Mdb.Ctd.Dots.Presentation
         {
             Dot = dot;
 
-            _animator.SetInteger(AnimatorUtils.Value, Dot.Value);
-            _valueLabel.text = Dot.Value.ToString();
+            SetValue(Dot.Value);
+            SetVisible(true);
 
             Rect parent = ((RectTransform)transform.parent).rect;
             ((RectTransform)transform).sizeDelta = new Vector2(parent.width, parent.height);
         }
 
-        internal void SetSelected(bool selected)
+        public void SetSelected(bool selected)
         {
             _animator.SetBool(AnimatorUtils.Selected, selected);
+        }
+
+        public void SetVisible(bool visible)
+        {
+            _animator.SetBool(AnimatorUtils.Visible, visible);
+        }
+
+        public void SetValue(int value)
+        {
+            _valueLabel.text = value.ToString();
+            _animator.SetInteger(AnimatorUtils.Value, value);
         }
     }
 }
