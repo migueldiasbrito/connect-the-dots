@@ -55,6 +55,10 @@ namespace Mdb.Ctd.Dots.Presentation
                 return;
             }
 
+            IDot lastSequencedDot = _currentDotsSwipedOver[^1].Dot;
+            IDot nextDot = dotSwipedOver.Dot;
+            if (!_dotGridDataReader.CanConnect(lastSequencedDot.X, lastSequencedDot.Y, nextDot.X, nextDot.Y)) return;
+
             _currentDotsSwipedOver.Add(dotSwipedOver);
             dotSwipedOver.SetSelected(true);
         }
