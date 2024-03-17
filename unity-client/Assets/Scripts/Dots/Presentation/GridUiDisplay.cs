@@ -1,5 +1,7 @@
 using Mdb.Ctd.Data;
 using Mdb.Ctd.Dots.Data;
+using Mdb.Ctd.Dots.Services;
+using Mdb.Ctd.Services;
 using Mdb.Ctd.Swipe;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +18,7 @@ namespace Mdb.Ctd.Dots.Presentation
         [SerializeField] private DotUiDisplay _currentSequenceValueDisplay;
 
         private IDotGridDataReader _dotGridDataReader;
+        private IDotsService _dotsService;
 
         private Dictionary<IDot, DotUiDisplay> _dotsDisplays = new();
 
@@ -24,6 +27,7 @@ namespace Mdb.Ctd.Dots.Presentation
         private void Start()
         {
             _dotGridDataReader = DataReaders.Get<IDotGridDataReader>();
+            _dotsService = ServiceLocator.Get<IDotsService>();
 
             _swipeController.Initialize(OnBeginSwipe, OnSwipeOverDot, OnEndSwipe);
 
@@ -78,6 +82,8 @@ namespace Mdb.Ctd.Dots.Presentation
 
         private void OnEndSwipe()
         {
+            _dotsService.ConnectSequence(_currentDotsSwipedOver.Select(x => (x.Dot.X, x.Dot.Y)).ToArray());
+
             for (int i = 0; i < _currentDotsSwipedOver.Count; ++i)
             {
                 _currentDotsSwipedOver[i].SetSelected(false);
