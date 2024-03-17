@@ -57,7 +57,9 @@ namespace Mdb.Ctd.Dots.Data
                 visited.Add(sequence[i]);
             }
 
-            return first.Value * 2 * (sequence.Length / 2);
+            // equivalent to first.Value * (int) Math.Pow(2, Mathf.FloorToInt(sequence.Length / 2.0f))
+            // doubles the value for each pair of dots, assuming they all have the same value
+            return first.Value * (1 << (sequence.Length / 2));
         }
 
         private bool IsPositionWithinGrid(int x, int y)
