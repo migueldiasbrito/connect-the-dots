@@ -31,23 +31,28 @@ namespace Mdb.Ctd.Dots.Data
             return false;
         }
 
+        private bool CanConnect((int x, int y) position1, (int x, int y) position2)
+        {
+            return CanConnect(position1.x, position1.y, position2.x, position2.y);
+        }
+
         public int GetSequenceValue((int x, int y)[] sequence)
         {
             if (sequence.Length == 0) return -1;
 
-            if (!sequence.All(position => IsPositionWithinGrid(position.x, position.y))) return -1;
+            if (!sequence.All(position => IsPositionWithinGrid(position))) return -1;
 
-            Dot first = Dots[sequence[0].x, sequence[0].y];
+            Dot first = GetDot(sequence[0]);
 
             if (sequence.Length == 1)
-                return first != null ? Grid[sequence[0].x, sequence[0].y].Value : -1;
+                return first != null ? first.Value : -1;
 
             List<(int x, int y)> visited = new () { sequence[0] };
             for (int i = 1; i < sequence.Length; ++i)
             {
-                if (visited.Any(position => position.x == sequence[i].x && position.y == sequence[i].y)) return -1;
+                if (visited.Any(position => IsSamePosition(position, sequence[i]))) return -1;
 
-                if (!CanConnect(sequence[i - 1].x, sequence[i - 1].y, sequence[i].x, sequence[i].y)) return -1;
+                if (!CanConnect(sequence[i - 1], sequence[i])) return -1;
 
                 visited.Add(sequence[i]);
             }
@@ -58,6 +63,23 @@ namespace Mdb.Ctd.Dots.Data
         private bool IsPositionWithinGrid(int x, int y)
         {
             return x >= 0 || x < Dots.GetLength(0) || y >= 0 || y < Dots.GetLength(1);
+        }
+
+        private bool IsPositionWithinGrid((int x, int y) position)
+        {
+            return IsPositionWithinGrid(position.x, position.y);
+        }
+
+        private Dot GetDot((int x, int y) position)
+        {
+            if (!IsPositionWithinGrid(position)) return null;
+
+            return Dots[position.x, position.y];
+        }
+
+        private static bool IsSamePosition((int x, int y) position1, (int x, int y) position2)
+        {
+            return position1.x == position2.x && position1.y == position2.y;
         }
     }
 }
