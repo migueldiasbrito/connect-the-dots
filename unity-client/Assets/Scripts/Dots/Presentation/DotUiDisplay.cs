@@ -39,5 +39,20 @@ namespace Mdb.Ctd.Dots.Presentation
             _valueLabel.text = value.ToString();
             _animator.SetInteger(AnimatorUtils.Value, value);
         }
+
+        public void UpdateDotValue()
+        {
+            SetValue(Dot.Value);
+        }
+
+        public void MergeInto(DotUiDisplay unifiedDot)
+        {
+            Destroy(gameObject);
+        }
+
+        public void UpdatePosition(Transform dotHolder)
+        {
+            transform.SetParent(dotHolder, false);
+        }
     }
 }

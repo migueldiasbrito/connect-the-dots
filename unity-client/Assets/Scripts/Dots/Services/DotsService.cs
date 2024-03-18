@@ -1,5 +1,7 @@
 using Mdb.Ctd.Dots.Config;
 using Mdb.Ctd.Dots.Data;
+using Mdb.Ctd.Dots.Notifications;
+using Mdb.Ctd.Notifications;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,11 +11,16 @@ namespace Mdb.Ctd.Dots.Services
     {
         private DotGrid _model;
 
+        private INotificationService _notificationService;
+
         private int[] _possibleNewValues;
 
-        public DotsService(DotGrid model, IDotsConfig config)
+        public DotsService(DotGrid model, IDotsConfig config, INotificationService notificationService)
         {
             _model = model;
+
+            _notificationService = notificationService;
+
             _model.Dots = new Dot[config.Width, config.Height];
 
             List<int> possibleNewValues = new();
@@ -36,14 +43,16 @@ namespace Mdb.Ctd.Dots.Services
 
             if (value == -1) return;
 
-            _model.Dots[sequence[^1].x, sequence[^1].y].Value = value;
-            // notify value change
+            Dot lastDot = _model.Dots[sequence[^1].x, sequence[^1].y];
+            lastDot.Value = value;
 
+            List<IDot> removedDots = new();
             for (int i = 0; i < sequence.Length - 1; ++i)
             {
+                removedDots.Add(_model.Dots[sequence[i].x, sequence[i].y]);
                 _model.Dots[sequence[i].x, sequence[i].y] = null;
-                // notify deleted dot
             }
+            _notificationService.Publish(new DotsMergedNotification(lastDot, removedDots));
 
             UpdateGridAfterSequence();
         }
@@ -53,7 +62,7 @@ namespace Mdb.Ctd.Dots.Services
             PullDownDotsOnRowsWithEmptyCells();
             FillEmptyGridSpaces();
 
-            // notify state updated
+            _notificationService.Publish(new GridUpdatedNotification());
         }
 
         private void PullDownDotsOnRowsWithEmptyCells()
@@ -69,7 +78,11 @@ namespace Mdb.Ctd.Dots.Services
                     }
                     else if (emptyCells > 0)
                     {
-                        _model.Dots[x, y - emptyCells] = _model.Dots[x, y];
+                        Dot dot = _model.Dots[x, y];
+                        dot.X = x;
+                        dot.Y = y - emptyCells;
+
+                        _model.Dots[x, y - emptyCells] = dot;
                         _model.Dots[x, y] = null;
                     }
                 }

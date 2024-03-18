@@ -1,8 +1,11 @@
 using Mdb.Ctd.Data;
 using Mdb.Ctd.Dots.Data;
+using Mdb.Ctd.Dots.Notifications;
 using Mdb.Ctd.Dots.Services;
+using Mdb.Ctd.Notifications;
 using Mdb.Ctd.Services;
 using Mdb.Ctd.Swipe;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +22,7 @@ namespace Mdb.Ctd.Dots.Presentation
 
         private IDotGridDataReader _dotGridDataReader;
         private IDotsService _dotsService;
+        private INotificationService _notificationService;
 
         private Dictionary<IDot, DotUiDisplay> _dotsDisplays = new();
 
@@ -28,10 +32,63 @@ namespace Mdb.Ctd.Dots.Presentation
         {
             _dotGridDataReader = DataReaders.Get<IDotGridDataReader>();
             _dotsService = ServiceLocator.Get<IDotsService>();
+            _notificationService = ServiceLocator.Get<INotificationService>();
+
+            SubscribeNotifications();
 
             _swipeController.Initialize(OnBeginSwipe, OnSwipeOverDot, OnEndSwipe);
 
             StartCoroutine(InitializeGrid());
+        }
+
+        private void SubscribeNotifications()
+        {
+            _notificationService.Subscribe<DotsMergedNotification>(OnDotsMerged);
+            _notificationService.Subscribe<GridUpdatedNotification>(OnGridUpdated);
+        }
+
+        private void OnDotsMerged(DotsMergedNotification notification)
+        {
+            DotUiDisplay unifiedDot = _dotsDisplays[notification.UnifiedDot];
+            unifiedDot.UpdateDotValue();
+
+            foreach (IDot removedDot in notification.RemovedDots)
+            {
+                _dotsDisplays[removedDot].MergeInto(unifiedDot);
+                _dotsDisplays.Remove(removedDot);
+            }
+        }
+
+        private void OnGridUpdated(GridUpdatedNotification _)
+        {
+            UpdateGrid();
+        }
+
+        private void UpdateGrid()
+        {
+            IDot[,] grid = _dotGridDataReader.Grid;
+
+            for (int x = 0; x < grid.GetLength(0); ++x)
+            {
+                for (int y = 0; y < grid.GetLength(1); ++y)
+                {
+                    IDot dot = grid[x, y];
+                    if (dot == null) continue;
+
+                    Transform dotHolder = _dotHolders[x + y * grid.GetLength(0)];
+
+                    if (_dotsDisplays.TryGetValue(dot, out DotUiDisplay dotDisplay))
+                    {
+                        dotDisplay.UpdatePosition(dotHolder);
+                    }
+                    else
+                    {
+                        dotDisplay = Instantiate(_dotPrefab, dotHolder);
+                        dotDisplay.Setup(dot);
+                        _dotsDisplays[dot] = dotDisplay;
+                    }
+                }
+            }
         }
 
         private void OnBeginSwipe(ISwipable swipable)
@@ -97,20 +154,18 @@ namespace Mdb.Ctd.Dots.Presentation
         {
             yield return new WaitForEndOfFrame();
 
-            IDot[,] grid = _dotGridDataReader.Grid;
+            UpdateGrid();
+        }
 
-            for (int x = 0; x < grid.GetLength(0); ++x)
-            {
-                for (int y = 0; y < grid.GetLength(1); ++y)
-                {
-                    IDot dot = grid[x, y];
-                    if (dot == null) continue;
+        private void OnDestroy()
+        {
+            UnsubscribeNotifications();
+        }
 
-                    DotUiDisplay dotDisplay = Instantiate(_dotPrefab, _dotHolders[x + y * grid.GetLength(0)]);
-                    dotDisplay.Setup(dot);
-                    _dotsDisplays[dot] = dotDisplay;
-                }
-            }
+        private void UnsubscribeNotifications()
+        {
+            _notificationService.Unsubscribe<DotsMergedNotification>(OnDotsMerged);
+            _notificationService.Unsubscribe<GridUpdatedNotification>(OnGridUpdated);
         }
     }
 }
