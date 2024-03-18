@@ -1503,7 +1503,7 @@ MonoBehaviour:
   - {fileID: 631057282}
   - {fileID: 1008846470}
   - {fileID: 87268939}
-  _dotPrefab: {fileID: 6802488368445549393, guid: e5bdf00fff2305d4fb1702b6ea4ef29e,
+  _dotPrefab: {fileID: 5092498612349524233, guid: e5bdf00fff2305d4fb1702b6ea4ef29e,
     type: 3}
   _swipeController: {fileID: 958081242}
   _currentSequenceValueDisplay: {fileID: 935799666}

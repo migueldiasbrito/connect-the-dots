@@ -16,7 +16,7 @@ namespace Mdb.Ctd.Dots.Presentation
     public class GridUiDisplay : MonoBehaviour
     {
         [SerializeField] private Transform[] _dotHolders;
-        [SerializeField] private DotUiDisplay _dotPrefab;
+        [SerializeField] private GridDotUiDisplay _dotPrefab;
         [SerializeField] private SwipeController _swipeController;
         [SerializeField] private DotUiDisplay _currentSequenceValueDisplay;
 
@@ -24,9 +24,9 @@ namespace Mdb.Ctd.Dots.Presentation
         private IDotsService _dotsService;
         private INotificationService _notificationService;
 
-        private Dictionary<IDot, DotUiDisplay> _dotsDisplays = new();
+        private Dictionary<IDot, GridDotUiDisplay> _dotsDisplays = new();
 
-        private List<DotUiDisplay> _currentDotsSwipedOver = new();
+        private List<GridDotUiDisplay> _currentDotsSwipedOver = new();
 
         private void Start()
         {
@@ -49,7 +49,7 @@ namespace Mdb.Ctd.Dots.Presentation
 
         private void OnDotsMerged(DotsMergedNotification notification)
         {
-            DotUiDisplay unifiedDot = _dotsDisplays[notification.UnifiedDot];
+            GridDotUiDisplay unifiedDot = _dotsDisplays[notification.UnifiedDot];
             unifiedDot.UpdateDotValue();
 
             foreach (IDot removedDot in notification.RemovedDots)
@@ -77,7 +77,7 @@ namespace Mdb.Ctd.Dots.Presentation
 
                     Transform dotHolder = _dotHolders[x + y * grid.GetLength(0)];
 
-                    if (_dotsDisplays.TryGetValue(dot, out DotUiDisplay dotDisplay))
+                    if (_dotsDisplays.TryGetValue(dot, out GridDotUiDisplay dotDisplay))
                     {
                         dotDisplay.UpdatePosition(dotHolder);
                     }
@@ -93,7 +93,7 @@ namespace Mdb.Ctd.Dots.Presentation
 
         private void OnBeginSwipe(ISwipable swipable)
         {
-            DotUiDisplay dotPressed = ((Swipable) swipable).Dot;
+            GridDotUiDisplay dotPressed = ((Swipable) swipable).Dot;
 
             _currentDotsSwipedOver.Add(dotPressed);
             dotPressed.SetSelected(true);
@@ -105,7 +105,7 @@ namespace Mdb.Ctd.Dots.Presentation
 
         private void OnSwipeOverDot(ISwipable swipable)
         {
-            DotUiDisplay dotSwipedOver = ((Swipable)swipable).Dot;
+            GridDotUiDisplay dotSwipedOver = ((Swipable)swipable).Dot;
 
             for (int i = 0; i < _currentDotsSwipedOver.Count; ++i)
             {
@@ -113,9 +113,13 @@ namespace Mdb.Ctd.Dots.Presentation
 
                 if (i == _currentDotsSwipedOver.Count - 1) return;
 
+                _currentDotsSwipedOver[i].SetConnectionVisible(
+                    GetDirection(_currentDotsSwipedOver[i].Dot, _currentDotsSwipedOver[i + 1].Dot), false);
+
                 for (int j = _currentDotsSwipedOver.Count - 1; j > i; --j)
                 {
                     _currentDotsSwipedOver[j].SetSelected(false);
+                    _currentDotsSwipedOver[j].HideAllConnections();
                 }
 
                 _currentDotsSwipedOver.RemoveRange(i + 1, _currentDotsSwipedOver.Count - i - 1);
@@ -126,15 +130,40 @@ namespace Mdb.Ctd.Dots.Presentation
                 return;
             }
 
-            IDot lastSequencedDot = _currentDotsSwipedOver[^1].Dot;
+            GridDotUiDisplay lastSequecedDotDisplay = _currentDotsSwipedOver[^1];
+            IDot lastSequencedDot = lastSequecedDotDisplay.Dot;
             IDot nextDot = dotSwipedOver.Dot;
             if (!_dotGridDataReader.CanConnect(lastSequencedDot.X, lastSequencedDot.Y, nextDot.X, nextDot.Y)) return;
 
             _currentDotsSwipedOver.Add(dotSwipedOver);
             dotSwipedOver.SetSelected(true);
 
+            lastSequecedDotDisplay.SetConnectionVisible(GetDirection(lastSequencedDot, nextDot), true);
+            dotSwipedOver.SetConnectionVisible(GetDirection(nextDot, lastSequencedDot), true);
+
             _currentSequenceValueDisplay.SetValue(_dotGridDataReader.GetSequenceValue(
                 _currentDotsSwipedOver.Select(x => (x.Dot.X, x.Dot.Y)).ToArray()));
+        }
+
+        private Direction GetDirection(IDot from, IDot to)
+        {
+            bool isNorther = from.Y < to.Y;
+            bool isSouther = from.Y > to.Y;
+            bool isEastern = from.X < to.X;
+            bool isWestern = from.X > to.X;
+
+            if (isNorther && isEastern) return Direction.Northeast;
+            if (isNorther && isWestern) return Direction.Northwest;
+
+            if (isSouther && isEastern) return Direction.Southeast;
+            if (isSouther && isWestern) return Direction.Southwest;
+
+            if (isNorther) return Direction.North;
+            if (isSouther) return Direction.South;
+            if (isEastern) return Direction.East;
+            if (isWestern) return Direction.West;
+
+            throw new ArgumentException();
         }
 
         private void OnEndSwipe()
@@ -144,6 +173,7 @@ namespace Mdb.Ctd.Dots.Presentation
             for (int i = 0; i < _currentDotsSwipedOver.Count; ++i)
             {
                 _currentDotsSwipedOver[i].SetSelected(false);
+                _currentDotsSwipedOver[i].HideAllConnections();
             }
             _currentDotsSwipedOver.Clear();
 

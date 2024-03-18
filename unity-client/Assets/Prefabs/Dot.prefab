@@ -187,7 +187,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b09f90e60f71714c987be0650322baf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _animator: {fileID: 880194537791870021}
+  <Animator>k__BackingField: {fileID: 880194537791870021}
   _valueLabel: {fileID: 3029285844434717545}
 --- !u!1 &3029285844434717551
 GameObject:

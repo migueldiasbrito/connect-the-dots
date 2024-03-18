@@ -5,6 +5,6 @@ namespace Mdb.Ctd.Dots.Presentation
 {
     public class Swipable : MonoBehaviour, ISwipable
     {
-        [field: SerializeField] public DotUiDisplay Dot { get; private set; }
+        [field: SerializeField] public GridDotUiDisplay Dot { get; private set; }
     }
 }
