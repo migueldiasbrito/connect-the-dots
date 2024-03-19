@@ -1507,6 +1507,8 @@ MonoBehaviour:
     type: 3}
   _swipeController: {fileID: 958081242}
   _currentSequenceValueDisplay: {fileID: 935799666}
+  _mergeAnimationTime: 0.2
+  _fallAnimationTime: 0.2
 --- !u!114 &958081242
 MonoBehaviour:
   m_ObjectHideFlags: 0

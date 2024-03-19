@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Mdb.Ctd.Dots.Presentation
 {
-    public class Swipable : MonoBehaviour, ISwipable
+    public class SwipableDot : MonoBehaviour, ISwipable
     {
         [field: SerializeField] public GridDotUiDisplay Dot { get; private set; }
     }

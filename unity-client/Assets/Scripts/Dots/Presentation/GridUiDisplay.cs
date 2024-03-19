@@ -20,6 +20,9 @@ namespace Mdb.Ctd.Dots.Presentation
         [SerializeField] private SwipeController _swipeController;
         [SerializeField] private DotUiDisplay _currentSequenceValueDisplay;
 
+        [SerializeField] private float _mergeAnimationTime = 0.1f;
+        [SerializeField] private float _fallAnimationTime = 0.1f;
+
         private IDotGridDataReader _dotGridDataReader;
         private IDotsService _dotsService;
         private INotificationService _notificationService;
@@ -49,14 +52,26 @@ namespace Mdb.Ctd.Dots.Presentation
 
         private void OnDotsMerged(DotsMergedNotification notification)
         {
-            GridDotUiDisplay unifiedDot = _dotsDisplays[notification.UnifiedDot];
-            unifiedDot.UpdateDotValue();
+            StartCoroutine(AnimateDotsMerged(notification.UnifiedDot, notification.RemovedDots));
+        }
 
-            foreach (IDot removedDot in notification.RemovedDots)
+        private IEnumerator AnimateDotsMerged(IDot unifiedDot, IReadOnlyList<IDot> removedDots)
+        {
+            Transform unifiedDotHolder =
+                _dotHolders[unifiedDot.X + unifiedDot.Y * _dotGridDataReader.Grid.GetLength(0)];
+
+            foreach (IDot removedDot in removedDots)
             {
-                _dotsDisplays[removedDot].MergeInto(unifiedDot);
+                _dotsDisplays[removedDot].MergeInto(unifiedDotHolder, _mergeAnimationTime);
                 _dotsDisplays.Remove(removedDot);
             }
+
+            GridDotUiDisplay unifiedDotDisplay = _dotsDisplays[unifiedDot];
+            unifiedDotDisplay.transform.SetAsLastSibling();
+
+            yield return new WaitForSeconds(_mergeAnimationTime);
+
+            unifiedDotDisplay.UpdateDotValue();
         }
 
         private void OnGridUpdated(GridUpdatedNotification _)
@@ -79,7 +94,7 @@ namespace Mdb.Ctd.Dots.Presentation
 
                     if (_dotsDisplays.TryGetValue(dot, out GridDotUiDisplay dotDisplay))
                     {
-                        dotDisplay.UpdatePosition(dotHolder);
+                        dotDisplay.UpdatePosition(dotHolder, _fallAnimationTime);
                     }
                     else
                     {
@@ -93,7 +108,7 @@ namespace Mdb.Ctd.Dots.Presentation
 
         private void OnBeginSwipe(ISwipable swipable)
         {
-            GridDotUiDisplay dotPressed = ((Swipable) swipable).Dot;
+            GridDotUiDisplay dotPressed = ((SwipableDot) swipable).Dot;
 
             _currentDotsSwipedOver.Add(dotPressed);
             dotPressed.SetSelected(true);
@@ -105,7 +120,7 @@ namespace Mdb.Ctd.Dots.Presentation
 
         private void OnSwipeOverDot(ISwipable swipable)
         {
-            GridDotUiDisplay dotSwipedOver = ((Swipable)swipable).Dot;
+            GridDotUiDisplay dotSwipedOver = ((SwipableDot)swipable).Dot;
 
             for (int i = 0; i < _currentDotsSwipedOver.Count; ++i)
             {

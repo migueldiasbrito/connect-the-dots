@@ -1,5 +1,7 @@
 using Mdb.Ctd.Dots.Data;
 using Mdb.Ctd.Utils;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -53,14 +55,42 @@ namespace Mdb.Ctd.Dots.Presentation
             _allConnections.ForEach(connection => connection.SetValue(Dot.Value));
         }
 
-        public void MergeInto(DotUiDisplay unifiedDot)
+        public void MergeInto(Transform unifiedDotHolder, float animationTime)
         {
-            Destroy(gameObject);
+            UpdatePosition(unifiedDotHolder, animationTime, () => Destroy(gameObject));
         }
 
-        public void UpdatePosition(Transform dotHolder)
+        public void UpdatePosition(Transform dotHolder, float animationTime, Action callback = null)
         {
-            transform.SetParent(dotHolder, false);
+            transform.SetParent(dotHolder, true);
+
+            StartCoroutine(ResetLocalPosition(animationTime, callback));
+        }
+
+        private IEnumerator ResetLocalPosition(float animationTime, Action callback)
+        {
+            float totalTime = 0;
+            Vector3 initialPosition = transform.localPosition;
+            Vector3 finalPosition = new Vector3(0, 0, initialPosition.z);
+
+            while (true)
+            {
+                if (totalTime >= animationTime)
+                {
+                    transform.localPosition = finalPosition;
+                    break;
+                }
+                else
+                {
+                    transform.localPosition = Vector3.Lerp(initialPosition, finalPosition, totalTime / animationTime);
+                }
+
+                yield return null;
+
+                totalTime += Time.deltaTime;
+            }
+
+            callback?.Invoke();
         }
 
         public void SetConnectionVisible(Direction direction, bool visible)
