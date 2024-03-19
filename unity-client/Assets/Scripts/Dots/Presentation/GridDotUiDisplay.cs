@@ -37,10 +37,22 @@ namespace Mdb.Ctd.Dots.Presentation
             Dot = dot;
 
             UpdateDotValue();
-            SetVisible(true);
 
             Rect parent = ((RectTransform)transform.parent).rect;
             ((RectTransform)transform).sizeDelta = new Vector2(parent.width, parent.height);
+        }
+
+        public void SetVisibleAsNew(float delay)
+        {
+            StartCoroutine(SetVisibleAsNewAfterDelay(delay));
+        }
+
+        private IEnumerator SetVisibleAsNewAfterDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+
+            Animator.SetTrigger(AnimatorUtils.New);
+            SetVisible(true);
         }
 
         public void SetSelected(bool selected)

@@ -76,11 +76,13 @@ namespace Mdb.Ctd.Dots.Presentation
 
         private void OnGridUpdated(GridUpdatedNotification _)
         {
-            UpdateGrid();
+            StartCoroutine(UpdateGrid(_mergeAnimationTime));
         }
 
-        private void UpdateGrid()
+        private IEnumerator UpdateGrid(float delay)
         {
+            yield return new WaitForSeconds(delay);
+
             IDot[,] grid = _dotGridDataReader.Grid;
 
             for (int x = 0; x < grid.GetLength(0); ++x)
@@ -100,6 +102,7 @@ namespace Mdb.Ctd.Dots.Presentation
                     {
                         dotDisplay = Instantiate(_dotPrefab, dotHolder);
                         dotDisplay.Setup(dot);
+                        dotDisplay.SetVisibleAsNew(_fallAnimationTime);
                         _dotsDisplays[dot] = dotDisplay;
                     }
                 }
@@ -199,7 +202,21 @@ namespace Mdb.Ctd.Dots.Presentation
         {
             yield return new WaitForEndOfFrame();
 
-            UpdateGrid();
+            IDot[,] grid = _dotGridDataReader.Grid;
+
+            for (int x = 0; x < grid.GetLength(0); ++x)
+            {
+                for (int y = 0; y < grid.GetLength(1); ++y)
+                {
+                    IDot dot = grid[x, y];
+                    if (dot == null) continue;
+
+                    GridDotUiDisplay dotDisplay = Instantiate(_dotPrefab, _dotHolders[x + y * grid.GetLength(0)]);
+                    dotDisplay.Setup(dot);
+                    dotDisplay.SetVisible(true);
+                    _dotsDisplays[dot] = dotDisplay;
+                }
+            }
         }
 
         private void OnDestroy()
