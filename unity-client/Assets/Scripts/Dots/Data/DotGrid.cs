@@ -57,9 +57,16 @@ namespace Mdb.Ctd.Dots.Data
                 visited.Add(sequence[i]);
             }
 
-            // equivalent to first.Value * (int) Math.Pow(2, Mathf.FloorToInt(sequence.Length / 2.0f))
-            // doubles the value for each pair of dots, assuming they all have the same value
-            return first.Value * (1 << (sequence.Length / 2));
+            int maxCoveredBaseTwoLength = 1;
+            int nextValue = 1;
+
+            while (nextValue <= sequence.Length)
+            {
+                maxCoveredBaseTwoLength = nextValue;
+                nextValue *= 2;
+            }
+
+            return first.Value * maxCoveredBaseTwoLength;
         }
 
         private bool IsPositionWithinGrid(int x, int y)
