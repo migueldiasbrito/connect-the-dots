@@ -124,32 +124,26 @@ namespace Mdb.Ctd.Dots.Presentation
         private void OnSwipeOverDot(ISwipable swipable)
         {
             GridDotUiDisplay dotSwipedOver = ((SwipableDot)swipable).Dot;
+            GridDotUiDisplay lastSequecedDotDisplay = _currentDotsSwipedOver[^1];
+            IDot lastSequencedDot = lastSequecedDotDisplay.Dot;
 
-            for (int i = 0; i < _currentDotsSwipedOver.Count; ++i)
+            if (_currentDotsSwipedOver.Count >= 2 && _currentDotsSwipedOver[^2] == dotSwipedOver)
             {
-                if (_currentDotsSwipedOver[i] != dotSwipedOver) continue;
+                dotSwipedOver.SetConnectionVisible(GetDirection(dotSwipedOver.Dot, lastSequencedDot), false);
 
-                if (i == _currentDotsSwipedOver.Count - 1) return;
+                lastSequecedDotDisplay.SetSelected(false);
+                lastSequecedDotDisplay.HideAllConnections();
 
-                _currentDotsSwipedOver[i].SetConnectionVisible(
-                    GetDirection(_currentDotsSwipedOver[i].Dot, _currentDotsSwipedOver[i + 1].Dot), false);
-
-                for (int j = _currentDotsSwipedOver.Count - 1; j > i; --j)
-                {
-                    _currentDotsSwipedOver[j].SetSelected(false);
-                    _currentDotsSwipedOver[j].HideAllConnections();
-                }
-
-                _currentDotsSwipedOver.RemoveRange(i + 1, _currentDotsSwipedOver.Count - i - 1);
-
+                _currentDotsSwipedOver.RemoveAt(_currentDotsSwipedOver.Count - 1);
+                
                 _currentSequenceValueDisplay.SetValue(_dotGridDataReader.GetSequenceValue(
-                    _currentDotsSwipedOver.Select(x => (x.Dot.X, x.Dot.Y)).ToArray()));
+                     _currentDotsSwipedOver.Select(x => (x.Dot.X, x.Dot.Y)).ToArray()));
 
                 return;
             }
 
-            GridDotUiDisplay lastSequecedDotDisplay = _currentDotsSwipedOver[^1];
-            IDot lastSequencedDot = lastSequecedDotDisplay.Dot;
+            if (_currentDotsSwipedOver.Contains(dotSwipedOver)) return;
+
             IDot nextDot = dotSwipedOver.Dot;
             if (!_dotGridDataReader.CanConnect(lastSequencedDot.X, lastSequencedDot.Y, nextDot.X, nextDot.Y)) return;
 
