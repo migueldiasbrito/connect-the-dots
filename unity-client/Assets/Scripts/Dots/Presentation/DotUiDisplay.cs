@@ -18,8 +18,9 @@ namespace Mdb.Ctd.Dots.Presentation
 
         public void SetValue(int value)
         {
-            _valueLabel.text = value.ToString();
             Animator.SetInteger(AnimatorUtils.Value, value);
+
+            _valueLabel.text = value >= 1000 ? $"{value / 1000}K" : value.ToString();
         }
     }
 }
