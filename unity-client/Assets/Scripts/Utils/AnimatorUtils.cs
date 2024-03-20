@@ -11,5 +11,7 @@ namespace Mdb.Ctd.Utils
         public static int Visible => Animator.StringToHash("Visible");
 
         public static int New => Animator.StringToHash("New");
+
+        public static int Fall => Animator.StringToHash("Fall");
     }
 }

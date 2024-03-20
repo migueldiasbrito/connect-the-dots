@@ -96,7 +96,7 @@ namespace Mdb.Ctd.Dots.Presentation
 
                     if (_dotsDisplays.TryGetValue(dot, out GridDotUiDisplay dotDisplay))
                     {
-                        dotDisplay.UpdatePosition(dotHolder, _fallAnimationTime);
+                        dotDisplay.UpdatePosition(dotHolder, _fallAnimationTime, () => dotDisplay.AnimateFall());
                     }
                     else
                     {

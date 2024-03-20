@@ -74,6 +74,8 @@ namespace Mdb.Ctd.Dots.Presentation
 
         public void UpdatePosition(Transform dotHolder, float animationTime, Action callback = null)
         {
+            if (transform.parent == dotHolder) return;
+
             transform.SetParent(dotHolder, true);
 
             StartCoroutine(ResetLocalPosition(animationTime, callback));
@@ -134,6 +136,11 @@ namespace Mdb.Ctd.Dots.Presentation
                     _southWestConnection.SetVisible(visible);
                     break;
             }
+        }
+
+        public void AnimateFall()
+        {
+            Animator.SetTrigger(AnimatorUtils.Fall);
         }
 
         public void HideAllConnections()
