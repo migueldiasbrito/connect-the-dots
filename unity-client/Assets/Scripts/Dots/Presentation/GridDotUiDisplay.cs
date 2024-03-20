@@ -138,14 +138,19 @@ namespace Mdb.Ctd.Dots.Presentation
             }
         }
 
+        public void HideAllConnections()
+        {
+            _allConnections.ForEach(connection => connection.SetVisible(false));
+        }
+
         public void AnimateFall()
         {
             Animator.SetTrigger(AnimatorUtils.Fall);
         }
 
-        public void HideAllConnections()
+        public void AnimateMerge()
         {
-            _allConnections.ForEach(connection => connection.SetVisible(false));
+            Animator.SetTrigger(AnimatorUtils.Merge);
         }
     }
 }

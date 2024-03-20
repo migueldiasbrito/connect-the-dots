@@ -20,8 +20,9 @@ namespace Mdb.Ctd.Dots.Presentation
         [SerializeField] private SwipeController _swipeController;
         [SerializeField] private DotUiDisplay _currentSequenceValueDisplay;
 
-        [SerializeField] private float _mergeAnimationTime = 0.1f;
-        [SerializeField] private float _fallAnimationTime = 0.1f;
+        [SerializeField] private float _mergeAnimationTime = 0.2f;
+        [SerializeField] private float _updateValueAnimationTime = 0.1f;
+        [SerializeField] private float _fallAnimationTime = 0.2f;
 
         private IDotGridDataReader _dotGridDataReader;
         private IDotsService _dotsService;
@@ -72,11 +73,12 @@ namespace Mdb.Ctd.Dots.Presentation
             yield return new WaitForSeconds(_mergeAnimationTime);
 
             unifiedDotDisplay.UpdateDotValue();
+            unifiedDotDisplay.AnimateMerge();
         }
 
         private void OnGridUpdated(GridUpdatedNotification _)
         {
-            StartCoroutine(UpdateGrid(_mergeAnimationTime));
+            StartCoroutine(UpdateGrid(_mergeAnimationTime + _updateValueAnimationTime));
         }
 
         private IEnumerator UpdateGrid(float delay)

@@ -13,5 +13,7 @@ namespace Mdb.Ctd.Utils
         public static int New => Animator.StringToHash("New");
 
         public static int Fall => Animator.StringToHash("Fall");
+
+        public static int Merge => Animator.StringToHash("Merge");
     }
 }
